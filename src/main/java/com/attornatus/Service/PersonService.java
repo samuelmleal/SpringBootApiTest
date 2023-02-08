@@ -26,7 +26,7 @@ public class PersonService {
     public List<PersonDTO> getAllPerson() throws IntegrationException{
         try {
             return personRepository.findAll();
-        } catch (DataAccessException ex) {
+        }catch (DataAccessException ex) {
             throw new IntegrationException("Falha na integração com banco de dados");
         }
     }
@@ -34,22 +34,23 @@ public class PersonService {
     public Optional<PersonDTO> getPersonById(Integer id) throws IntegrationException{
         try {
             return personRepository.findById(id);
-        } catch (DataAccessException ex) {
+        }catch (DataAccessException ex) {
             throw new IntegrationException("Falha na integração com banco de dados");
         }
     }
 
-    public void createPerson(PersonDTO personDTO) throws IntegrationException{
+    public PersonDTO createPerson(PersonDTO personDTO) throws IntegrationException{
         try{
             this.personRepository.save(personDTO);
+            return personDTO;
         }catch (DataAccessException ex) {
             throw new IntegrationException("Falha ao persistir objeto no banco de dados");
         }
     }
 
-    public void updatePerson(PersonDTO personDTO, AdressDTO adressDTO, Integer id) throws IntegrationException{
+    public PersonDTO updatePerson(PersonDTO personDTO, Integer id) throws IntegrationException{
         try{
-            if(adressDTO.getIsPrincipal() == true) {
+            if(personDTO.getAdress().getIsPrincipal() == true) {
                 this.personRepository.save(personDTO);
             }else{
                 this.personRepository.savePerson(personDTO.getName(), personDTO.getBirth(), id);
@@ -57,9 +58,10 @@ public class PersonService {
         }catch (DataAccessException ex) {
             throw new IntegrationException("Falha ao persistir objeto no banco de dados");
         }
+        return personDTO;
     }
 
-    public void createAdress(AdressDTO adressDTO, Integer id) throws IntegrationException{
+    public AdressDTO createAdress(AdressDTO adressDTO, Integer id) throws IntegrationException{
         try{
             this.adressRepository.create(
                     adressDTO.getStreet(),
@@ -70,9 +72,10 @@ public class PersonService {
         }catch (DataAccessException ex) {
             throw new IntegrationException("Falha ao persistir objeto no banco de dados");
         }
+        return adressDTO;
     }
 
-    public List<AdressDTO> getAdressBYPerson(Integer id) throws IntegrationException{
+    public List<AdressDTO> getAdressByPerson(Integer id) throws IntegrationException{
         try{
             return adressRepository.findByPerson(id);
         }catch (DataAccessException ex) {
