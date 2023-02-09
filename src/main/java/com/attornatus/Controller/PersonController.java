@@ -45,7 +45,7 @@ public class PersonController {
     @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
     @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
     @GetMapping("/")
-    public ResponseEntity<List<PersonDTO>>  findAll(){
+    public ResponseEntity<List<PersonDTO>> findAll(){
         List<PersonDTO> response = personService.getAllPerson();
         return ResponseEntity.ok(response);
     }

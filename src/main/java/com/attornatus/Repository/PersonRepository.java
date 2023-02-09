@@ -1,9 +1,6 @@
 package com.attornatus.Repository;
-
-import com.attornatus.DTO.PersonDTO;
 import com.attornatus.Model.Person;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,15 +12,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@EnableJpaRepositories
 public interface PersonRepository<T extends Person> extends JpaRepository<T, Integer> {
 
+    @Query(value = "SELECT * FROM person WHERE id =:id", nativeQuery = true)
     Optional<T> findById(@Param("id") Integer id);
-
+    @Query(value = "SELECT * FROM person", nativeQuery = true)
     List<T> findAll();
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE person SET name = :name, birth = :birth WHERE id = :id")
+    @Query(value = "UPDATE person SET name = :name, birth = :birth WHERE id = :id", nativeQuery = true)
     void savePerson(@Param("name") String name, @Param("birth") String birth, @Param("id") Integer id);
 
 }

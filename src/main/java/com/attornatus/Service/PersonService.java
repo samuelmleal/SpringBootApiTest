@@ -2,6 +2,7 @@ package com.attornatus.Service;
 
 import com.attornatus.DTO.AdressDTO;
 import com.attornatus.DTO.PersonDTO;
+import com.attornatus.Model.Person;
 import com.attornatus.Repository.AdressRepository;
 import com.attornatus.Repository.PersonRepository;
 import org.hibernate.secure.spi.IntegrationException;
@@ -41,7 +42,9 @@ public class PersonService {
 
     public PersonDTO createPerson(PersonDTO personDTO) throws IntegrationException{
         try{
-            this.personRepository.save(personDTO);
+            Person person = new Person(personDTO);
+            personRepository.save(person);
+            adressRepository.create(personDTO.getAdress().getStreet(),personDTO.getAdress().getCep(),personDTO.getAdress().getCity(),personDTO.getAdress().getNumber(), person.getId());
             return personDTO;
         }catch (DataAccessException ex) {
             throw new IntegrationException("Falha ao persistir objeto no banco de dados");
@@ -51,9 +54,10 @@ public class PersonService {
     public PersonDTO updatePerson(PersonDTO personDTO, Integer id) throws IntegrationException{
         try{
             if(personDTO.getAdress().getIsPrincipal() == true) {
-                this.personRepository.save(personDTO);
+                Person person = new Person(personDTO);
+                personRepository.save(person);
             }else{
-                this.personRepository.savePerson(personDTO.getName(), personDTO.getBirth(), id);
+                personRepository.savePerson(personDTO.getName(), personDTO.getBirth(), id);
             }
         }catch (DataAccessException ex) {
             throw new IntegrationException("Falha ao persistir objeto no banco de dados");
@@ -63,7 +67,7 @@ public class PersonService {
 
     public AdressDTO createAdress(AdressDTO adressDTO, Integer id) throws IntegrationException{
         try{
-            this.adressRepository.create(
+            adressRepository.create(
                     adressDTO.getStreet(),
                     adressDTO.getCep(),
                     adressDTO.getCity(),

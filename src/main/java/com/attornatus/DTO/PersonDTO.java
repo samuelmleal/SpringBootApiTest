@@ -20,7 +20,6 @@ public class PersonDTO {
     @JsonProperty(value = "birth")
     private String birth;
     @NotBlank(message = "O endereço é obrigatório")
-    @JsonProperty(value = "adress")
     private AdressDTO adress;
 
 }

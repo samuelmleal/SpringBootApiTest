@@ -2,17 +2,15 @@ package com.attornatus.Model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
-@Entity
+@Entity (name = "adress")
 @Table(name = "adress")
 public class Adress {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
     @Column(name= "name")
@@ -23,6 +21,7 @@ public class Adress {
     private Integer number;
     @Column(name = "city", nullable = false)
     private String city;
-    @Column(name = "person_id")
-    private String personId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id")
+    private Person person;
 }
