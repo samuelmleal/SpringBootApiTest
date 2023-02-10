@@ -13,9 +13,9 @@ public class Adress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name= "name")
+    @Column(name= "street", nullable = false)
     private String street;
-    @Column(name = "birth")
+    @Column(name = "cep", nullable = false)
     private String cep;
     @Column(name = "number", nullable = false)
     private Integer number;

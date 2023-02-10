@@ -1,11 +1,13 @@
 package com.attornatus.Model;
 
 import com.attornatus.DTO.PersonDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
+@AllArgsConstructor
 @Entity(name = "person")
 @Table(name = "person")
 public class Person {
@@ -16,7 +18,6 @@ public class Person {
     private Integer id;
     @Column(name= "name", nullable = false)
     private String name;
-
     @Column(name = "birth", nullable = false)
     private String birth;
     @Column(name = "street", nullable = false)
@@ -38,5 +39,15 @@ public class Person {
     }
 
     public Person() {
+    }
+
+    public Person(PersonDTO personDTO, Integer id) {
+        this.id = id;
+        this.name = personDTO.getName();
+        this.birth = personDTO.getBirth();
+        this.street =  personDTO.getAdress().getStreet();
+        this.cep = personDTO.getAdress().getCep();
+        this.number = personDTO.getAdress().getNumber();
+        this.city = personDTO.getAdress().getCity();
     }
 }

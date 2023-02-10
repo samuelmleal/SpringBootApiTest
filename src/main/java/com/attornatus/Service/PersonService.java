@@ -2,6 +2,8 @@ package com.attornatus.Service;
 
 import com.attornatus.DTO.AdressDTO;
 import com.attornatus.DTO.PersonDTO;
+import com.attornatus.Exceptions.BadRequestException;
+import com.attornatus.Model.Adress;
 import com.attornatus.Model.Person;
 import com.attornatus.Repository.AdressRepository;
 import com.attornatus.Repository.PersonRepository;
@@ -24,19 +26,29 @@ public class PersonService {
         this.adressRepository = adressRepository;
     }
 
-    public List<PersonDTO> getAllPerson() throws IntegrationException{
+    public List<Person> getAllPerson() throws IntegrationException{
         try {
-            return personRepository.findAll();
+             List<Person> response = personRepository.findAll();
+             if(response == null){
+                 throw new BadRequestException("Não há pessoas cadastradas no banco de dados");
+             }else{
+                 return response;
+             }
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha na integração com banco de dados");
+            throw new IntegrationException("Houve uma falha ao enviar a request");
         }
     }
 
-    public Optional<PersonDTO> getPersonById(Integer id) throws IntegrationException{
+    public Optional<Person> getPersonById(Integer id) throws IntegrationException{
         try {
-            return personRepository.findById(id);
+            Optional<Person> response = personRepository.findById(id);
+            if(response == null){
+                throw new BadRequestException("Não foi encontrada pessoa com o id: " + id);
+            }else{
+                return response;
+            }
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha na integração com banco de dados");
+            throw new IntegrationException("Houve uma falha ao enviar a request");
         }
     }
 
@@ -44,46 +56,79 @@ public class PersonService {
         try{
             Person person = new Person(personDTO);
             personRepository.save(person);
-            adressRepository.create(personDTO.getAdress().getStreet(),personDTO.getAdress().getCep(),personDTO.getAdress().getCity(),personDTO.getAdress().getNumber(), person.getId());
-            return personDTO;
+            if(personDTO.getAdress().getIsPrincipal()){
+                adressRepository.create(personDTO.getAdress().getStreet(), personDTO.getAdress().getCep(), personDTO.getAdress().getCity(), personDTO.getAdress().getNumber(), person.getId());
+            }
+                return personDTO;
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha ao persistir objeto no banco de dados");
+            throw new IntegrationException("Houve uma falha ao enviar a request");
         }
     }
 
     public PersonDTO updatePerson(PersonDTO personDTO, Integer id) throws IntegrationException{
         try{
-            if(personDTO.getAdress().getIsPrincipal() == true) {
-                Person person = new Person(personDTO);
+            if(personDTO.getAdress().getIsPrincipal()) {
+                Person person = new Person(personDTO, id);
                 personRepository.save(person);
             }else{
-                personRepository.savePerson(personDTO.getName(), personDTO.getBirth(), id);
+                personRepository.savePersonNotPrincipal(personDTO.getName(), personDTO.getBirth(), id);
             }
+            return personDTO;
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha ao persistir objeto no banco de dados");
+            throw new IntegrationException("Houve uma falha ao enviar a request");
         }
-        return personDTO;
     }
 
     public AdressDTO createAdress(AdressDTO adressDTO, Integer id) throws IntegrationException{
         try{
-            adressRepository.create(
-                    adressDTO.getStreet(),
-                    adressDTO.getCep(),
-                    adressDTO.getCity(),
-                    adressDTO.getNumber(),
-                    id);
+            boolean exists = validatePerson(id);
+            if(!exists){
+                throw new BadRequestException("O id informado não existe no banco de dados");
+            }
+            if(exists && adressDTO.getIsPrincipal()){
+                adressRepository.updateAdressPrincipal(adressDTO.getStreet(),
+                        adressDTO.getCep(),
+                        adressDTO.getCity(),
+                        adressDTO.getNumber(),
+                        id);
+            }
+            else {
+                adressRepository.create(
+                        adressDTO.getStreet(),
+                        adressDTO.getCep(),
+                        adressDTO.getCity(),
+                        adressDTO.getNumber(),
+                        id);
+            }
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha ao persistir objeto no banco de dados");
+            throw new IntegrationException("Falha ao se comunicar com o banco de dados");
         }
         return adressDTO;
     }
 
-    public List<AdressDTO> getAdressByPerson(Integer id) throws IntegrationException{
+    public List<Adress> getAdressByPerson(Integer id) throws IntegrationException{
         try{
-            return adressRepository.findByPerson(id);
+            List<Adress> response = adressRepository.findByPerson(id);
+            if(response == null){
+                throw new BadRequestException("Não foi encontrada pessoa com o id: " + id);
+            }else{
+                return response;
+            }
         }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha ao persistir objeto no banco de dados");
+            throw new IntegrationException("Falha ao se comunicar com o banco de dados");
+        }
+    }
+
+    private boolean validatePerson(Integer id) {
+        try {
+            Integer response = adressRepository.validatePerson(id);
+            if(response == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }catch (DataAccessException ex) {
+            throw new IntegrationException("Falha ao se comunicar com o banco de dados");
         }
     }
 

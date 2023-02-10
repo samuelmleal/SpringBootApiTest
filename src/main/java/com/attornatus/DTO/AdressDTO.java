@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Data
@@ -22,7 +23,7 @@ public class AdressDTO {
     @NotBlank(message = "O CEP é obrigatório")
     @JsonProperty(value = "cep")
     private String cep;
-    @NotBlank(message = "Número é obrigatório")
+    @NotNull(message = "Número é obrigatório")
     @JsonProperty(value = "number")
     private Integer number;
 
@@ -30,7 +31,6 @@ public class AdressDTO {
     @JsonProperty(value = "city")
     private String city;
 
-    @NotBlank(message = "Deve informar se é o endereço principal")
     @JsonProperty(value = "isPrincipal")
     private boolean isPrincipal;
 
