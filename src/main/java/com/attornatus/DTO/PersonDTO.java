@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonDTO {
+public class PersonDTO  {
 
     @NotBlank(message = "O nome é obrigatório")
     @JsonProperty(value = "name")
@@ -19,7 +20,8 @@ public class PersonDTO {
     @NotBlank(message= "A data de nascimento é obrigatória")
     @JsonProperty(value = "birth")
     private String birth;
-
+    @Valid
+    @JsonProperty(value = "adress")
     private AdressDTO adress;
 
 }

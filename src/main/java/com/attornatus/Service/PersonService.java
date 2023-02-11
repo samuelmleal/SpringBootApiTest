@@ -1,5 +1,6 @@
 package com.attornatus.Service;
 
+import com.attornatus.Config.LoggerConfig;
 import com.attornatus.DTO.AdressDTO;
 import com.attornatus.DTO.PersonDTO;
 import com.attornatus.Exceptions.BadRequestException;
@@ -9,6 +10,7 @@ import com.attornatus.Repository.AdressRepository;
 import com.attornatus.Repository.PersonRepository;
 import org.hibernate.secure.spi.IntegrationException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +31,8 @@ public class PersonService {
     public List<Person> getAllPerson() throws IntegrationException{
         try {
              List<Person> response = personRepository.findAll();
-             if(response == null){
+             if(response.isEmpty()){
+                 LoggerConfig.warn(HttpStatus.NOT_FOUND, "Não há pessoas cadastradas no banco de dados");
                  throw new BadRequestException("Não há pessoas cadastradas no banco de dados");
              }else{
                  return response;
@@ -42,7 +45,8 @@ public class PersonService {
     public Optional<Person> getPersonById(Integer id) throws IntegrationException{
         try {
             Optional<Person> response = personRepository.findById(id);
-            if(response == null){
+            if(response.isEmpty()){
+                LoggerConfig.warn(HttpStatus.NOT_FOUND, "Não foi encontrada pessoa com o id: " + id );
                 throw new BadRequestException("Não foi encontrada pessoa com o id: " + id);
             }else{
                 return response;
@@ -67,7 +71,12 @@ public class PersonService {
 
     public PersonDTO updatePerson(PersonDTO personDTO, Integer id) throws IntegrationException{
         try{
-            if(personDTO.getAdress().getIsPrincipal()) {
+            boolean exists = validatePerson(id);
+            if(!exists){
+                LoggerConfig.warn(HttpStatus.NOT_FOUND, "O id informado não existe no banco de dados");
+                throw new BadRequestException("O id informado não existe no banco de dados");
+            }
+            else if(personDTO.getAdress().getIsPrincipal()) {
                 Person person = new Person(personDTO, id);
                 personRepository.save(person);
             }else{
@@ -83,6 +92,7 @@ public class PersonService {
         try{
             boolean exists = validatePerson(id);
             if(!exists){
+                LoggerConfig.warn(HttpStatus.NOT_FOUND, "O id informado não existe no banco de dados");
                 throw new BadRequestException("O id informado não existe no banco de dados");
             }
             if(exists && adressDTO.getIsPrincipal()){
@@ -106,16 +116,17 @@ public class PersonService {
         return adressDTO;
     }
 
-    public List<Adress> getAdressByPerson(Integer id) throws IntegrationException{
+    public List<Adress> getAdressByPerson(Integer id) throws BadRequestException{
         try{
             List<Adress> response = adressRepository.findByPerson(id);
-            if(response == null){
+            if(response.isEmpty()){
+                LoggerConfig.warn(HttpStatus.NOT_FOUND, "Não foi encontrada pessoa com o id: " + id);
                 throw new BadRequestException("Não foi encontrada pessoa com o id: " + id);
             }else{
                 return response;
             }
-        }catch (DataAccessException ex) {
-            throw new IntegrationException("Falha ao se comunicar com o banco de dados");
+        }catch (Exception ex) {
+            throw new BadRequestException("Não foi encontrada pessoa com o id: " + id);
         }
     }
 

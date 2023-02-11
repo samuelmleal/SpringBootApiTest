@@ -1,7 +1,7 @@
 package com.attornatus.Controller;
 
 import com.attornatus.DTO.AdressDTO;
-import com.attornatus.DTO.ErrorDetail;
+import com.attornatus.DTO.ErrorObject;
 import com.attornatus.DTO.PersonDTO;
 import com.attornatus.Model.Adress;
 import com.attornatus.Model.Person;
@@ -38,19 +38,19 @@ public class PersonController {
     @Operation(summary = "Busca pessoa por id")
     @ApiResponse(responseCode = "200", description = "Requisição feita no serviço", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class)) })
-    @ApiResponse(responseCode = "400", description = "Dados de entrada invalidos", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
+    @ApiResponse(responseCode = "400", description = "Dados de entrada invalidos", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
     @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Optional<Person>> findById (@PathVariable("id") @NotNull Integer id) {
+    public ResponseEntity<Optional<Person>> findById (@Valid @PathVariable("id") @NotNull Integer id) {
         Optional<Person> response = personService.getPersonById(id);
         return ResponseEntity.ok(response);
     }
     @Operation(summary = "Retorna todas as pessoas em formato de lista")
     @ApiResponse(responseCode = "200", description = "Resposta da operação", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class)) })
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
     @GetMapping("/")
     public ResponseEntity<List<Person>> findAll(){
         List<Person> response = personService.getAllPerson();
@@ -60,8 +60,8 @@ public class PersonController {
     @Operation(summary = "Cria uma pessoa")
     @ApiResponse(responseCode = "200", description = "Resposta da operação", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class)) })
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
     @PostMapping("/createPerson")
     public ResponseEntity<PersonDTO> create(@Valid @RequestBody PersonDTO personDTO){
         PersonDTO response = personService.createPerson(personDTO);
@@ -71,10 +71,10 @@ public class PersonController {
     @Operation(summary = "Atualiza os dados de uma pessoa")
     @ApiResponse(responseCode = "200", description = "Resposta da operação", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class)) })
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
     @PutMapping("/updatePerson/{id}")
-    public ResponseEntity<PersonDTO> update(@PathVariable("id") Integer id, @Valid @RequestBody PersonDTO personDTO){
+    public ResponseEntity<PersonDTO> update(@Valid @PathVariable("id") Integer id, @Valid @RequestBody PersonDTO personDTO){
         PersonDTO response = personService.updatePerson(personDTO, id);
         return ResponseEntity.ok(response);
     }
@@ -82,8 +82,8 @@ public class PersonController {
     @Operation(summary = "Cria um endereço, ligado a uma pessoa")
     @ApiResponse(responseCode = "200", description = "Resposta da operação", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = AdressDTO.class)) })
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
     @PostMapping("/createAdress/{id}")
     public ResponseEntity<AdressDTO> createAdress(@PathVariable("id") Integer id, @Valid @RequestBody AdressDTO adressDTO){
         AdressDTO response = personService.createAdress(adressDTO, id);
@@ -93,9 +93,9 @@ public class PersonController {
     @Operation(summary = "Busca o endereço ligado a uma pessoa")
     @ApiResponse(responseCode = "200", description = "Resposta da operação", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = AdressDTO.class)) })
-    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDetail.class)))
-    @PostMapping("/getAdress/{id}")
+    @ApiResponse(responseCode = "500", description = "Falha no processamento", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @ApiResponse(responseCode = "503", description = "Falha ao se comunicar com o banco de dados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObject.class)))
+    @GetMapping("/getAdress/{id}")
     public ResponseEntity<List<Adress>> getAdress(@Valid @PathVariable("id") Integer id){
         List<Adress> response = personService.getAdressByPerson(id);
         return ResponseEntity.ok(response);
